@@ -2,14 +2,21 @@ import pickle
 import numpy as np
 from fastapi import FastAPI
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 
 model = pickle.load(open("lung_model.pkl", "rb"))
+print(type(model))
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class InputData(BaseModel):
-    gender: int
-    age: int
     smoking: int
     yellow_fingers: int
     anxiety: int
@@ -27,8 +34,6 @@ class InputData(BaseModel):
 @app.post("/predict")
 def predict(data: InputData):
     input_array = np.array([[
-        data.gender,
-        data.age,
         data.smoking,
         data.yellow_fingers,
         data.anxiety,
