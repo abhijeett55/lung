@@ -1,13 +1,14 @@
-import pickle
+import joblib
 import numpy as np
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
-model = pickle.load(open("lung_model.pkl", "rb"))
+model = joblib.load("lung_model.pkl")
 print(type(model))
 
 app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -33,24 +34,33 @@ class InputData(BaseModel):
 
 @app.post("/predict")
 def predict(data: InputData):
-    input_array = np.array([[
-        data.smoking,
-        data.yellow_fingers,
-        data.anxiety,
-        data.peer_pressure,
-        data.chronic_disease,
-        data.fatigue,
-        data.allergy,
-        data.wheezing,
-        data.alcohol_consuming,
-        data.coughing,
-        data.shortness_of_breath,
-        data.swallowing_difficulty,
-        data.chest_pain
-    ]])
+    try:
+        print("Incoming:", data)
 
-    prediction = model.predict(input_array)[0]
+        input_array = np.array([[ 
+            int(data.smoking),
+            int(data.yellow_fingers),
+            int(data.anxiety),
+            int(data.peer_pressure),
+            int(data.chronic_disease),
+            int(data.fatigue),
+            int(data.allergy),
+            int(data.wheezing),
+            int(data.alcohol_consuming),
+            int(data.coughing),
+            int(data.shortness_of_breath),
+            int(data.swallowing_difficulty),
+            int(data.chest_pain
+        )]])
 
-    return {
-        "result": "Cancer Detected" if prediction == 1 else "No Cancer"
-    }
+        print("Array:", input_array)
+
+        prediction = model.predict(input_array)[0]
+
+        return {
+            "result": "Cancer Detected" if prediction == 2 else "No Cancer"
+        }
+
+    except Exception as e:
+        print("ERROR:", str(e))
+        return {"error": str(e)}
