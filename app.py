@@ -1,10 +1,11 @@
+import os
 import joblib
 import numpy as np
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
-model = joblib.load("lung_model.pkl")
+model = joblib.load(os.path.join(os.path.dirname(__file__), "lung_model.pkl"))
 print(type(model))
 
 app = FastAPI()
@@ -50,8 +51,8 @@ def predict(data: InputData):
             int(data.coughing),
             int(data.shortness_of_breath),
             int(data.swallowing_difficulty),
-            int(data.chest_pain
-        )]])
+            int(data.chest_pain)
+            ]])
 
         print("Array:", input_array)
 

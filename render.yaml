@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: lung-cancer-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app:app  --port 5000
