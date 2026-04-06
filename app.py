@@ -58,8 +58,15 @@ def predict(data: InputData):
 
         prediction = model.predict(input_array)[0]
 
+        
+        if prediction >= 1.5:
+            result = "Cancer Detected"
+        else:
+            result = "No Cancer"
+
         return {
-            "result": "Cancer Detected" if prediction == 1 else "No Cancer"
+            "prediction": float(prediction),
+            "result": result
         }
 
     except Exception as e:
