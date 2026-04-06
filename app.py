@@ -107,6 +107,7 @@ def predict(data: InputData):
 
         print("Array:", input_array)
 
+        # ✅ FIXED
         prediction = int(model.predict(input_array)[0])
 
         probability = None
