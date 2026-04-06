@@ -39,38 +39,41 @@ class InputData(BaseModel):
     swallowing_difficulty: int
     chest_pain: int
 
+@app.get("/")
+def home():
+    return {"message": "Lung Cancer API is running 🚀"}
 
 @app.post("/predict")
 def predict(data: InputData):
     try:
 
-        input_df = pd.DataFrame([{
-            "SMOKING": data.smoking,
-            "YELLOW_FINGERS": data.yellow_fingers,
-            "ANXIETY": data.anxiety,
-            "PEER_PRESSURE": data.peer_pressure,
-            "CHRONIC DISEASE": data.chronic_disease,
-            "FATIGUE": data.fatigue,
-            "ALLERGY": data.allergy,
-            "WHEEZING": data.wheezing,
-            "ALCOHOL CONSUMING": data.alcohol_consuming,
-            "COUGHING": data.coughing,
-            "SHORTNESS OF BREATH": data.shortness_of_breath,
-            "SWALLOWING DIFFICULTY": data.swallowing_difficulty,
-            "CHEST PAIN": data.chest_pain
-        }])
+        input_array = np.array([[ 
+            int(data.smoking),
+            int(data.yellow_fingers),
+            int(data.anxiety),
+            int(data.peer_pressure),
+            int(data.chronic_disease),
+            int(data.fatigue),
+            int(data.allergy),
+            int(data.wheezing),
+            int(data.alcohol_consuming),
+            int(data.coughing),
+            int(data.shortness_of_breath),
+            int(data.swallowing_difficulty),
+            int(data.chest_pain)
+            ]])
 
         # clean columns
-        input_df.columns = input_df.columns.str.strip()
+        input_array.columns = input_array.columns.str.strip()
         model_features = [col.strip() for col in model.feature_names_in_]
 
-        input_df = input_df.reindex(columns=model_features, fill_value=0)
+        input_array = input_array.reindex(columns=model_features, fill_value=0)
 
-        prediction = model.predict(input_df)[0]
+        prediction = model.predict(input_array)[0]
 
         probability = None
         if hasattr(model, "predict_proba"):
-            probability = model.predict_proba(input_df)[0][1]
+            probability = model.predict_proba(input_array)[0][1]
 
         result = "Cancer Detected" if prediction == 1 else "No Cancer"
 
