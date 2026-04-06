@@ -56,8 +56,8 @@ def predict(data: InputData):
 
         print("Array:", input_array)
 
-        prediction = model.predict(input_array)[0]
-        prediction = float(prediction[0][0])
+        prediction = model.predict(input_array)
+        prediction = float(prediction.flatten()[0])
 
         
         if prediction >= 1.5:
