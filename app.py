@@ -44,39 +44,82 @@ class InputData(BaseModel):
 def home():
     return {"message": "Lung Cancer API is running 🚀"}
 
+# @app.post("/predict")
+# def predict(data: InputData):
+#     try:
+
+#         input_array = np.array([[ 
+#             int(data.smoking),
+#             int(data.yellow_fingers),
+#             int(data.anxiety),
+#             int(data.peer_pressure),
+#             int(data.chronic_disease),
+#             int(data.fatigue),
+#             int(data.allergy),
+#             int(data.wheezing),
+#             int(data.alcohol_consuming),
+#             int(data.coughing),
+#             int(data.shortness_of_breath),
+#             int(data.swallowing_difficulty),
+#             int(data.chest_pain)
+#             ]])
+        
+#         print("Array:", input_array)
+
+#         prediction = model.predict(input_array)[0]
+
+#         probability = None
+#         if hasattr(model, "predict_proba"):
+#             probability = model.predict_proba(input_array)[0][1]
+
+#         result = "Cancer Detected" if prediction == 1 else "No Cancer"
+
+#         return {
+#             "prediction": int(prediction),
+#             "probability": float(probability) if probability else None,
+#             "result": result
+#         }
+
+#     except Exception as e:
+#         print("❌ ERROR:", str(e))
+#         return {"error": str(e)}
+
 @app.post("/predict")
 def predict(data: InputData):
     try:
 
         input_array = np.array([[ 
-            int(data.smoking),
-            int(data.yellow_fingers),
-            int(data.anxiety),
-            int(data.peer_pressure),
-            int(data.chronic_disease),
-            int(data.fatigue),
-            int(data.allergy),
-            int(data.wheezing),
-            int(data.alcohol_consuming),
-            int(data.coughing),
-            int(data.shortness_of_breath),
-            int(data.swallowing_difficulty),
-            int(data.chest_pain)
-            ]])
-        
+            data.smoking,
+            data.yellow_fingers,
+            data.anxiety,
+            data.peer_pressure,
+            data.chronic_disease,
+            data.fatigue,
+            data.allergy,
+            data.wheezing,
+            data.alcohol_consuming,
+            data.coughing,
+            data.shortness_of_breath,
+            data.swallowing_difficulty,
+            data.chest_pain
+        ]])
+
         print("Array:", input_array)
 
-        prediction = model.predict(input_array)[0]
+        # FIX HERE
+        prediction = model.predict(input_array)
+        prediction = float(prediction.squeeze())
 
         probability = None
         if hasattr(model, "predict_proba"):
-            probability = model.predict_proba(input_array)[0][1]
+            prob = model.predict_proba(input_array)
+            probability = float(prob.squeeze()[1])
 
-        result = "Cancer Detected" if prediction == 1 else "No Cancer"
+        result = "Cancer Detected" if prediction >= 0.5 else "No Cancer"
 
         return {
-            "prediction": int(prediction),
-            "probability": float(probability) if probability else None,
+            "prediction": prediction,
+            "probability": probability,
             "result": result
         }
 
