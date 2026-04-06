@@ -59,7 +59,7 @@ def predict(data: InputData):
         prediction = model.predict(input_array)[0]
 
         return {
-            "result": "Cancer Detected" if prediction == 2 else "No Cancer"
+            "result": "Cancer Detected" if prediction == 1 else "No Cancer"
         }
 
     except Exception as e:
