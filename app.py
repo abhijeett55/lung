@@ -67,14 +67,14 @@ def predict(data: InputData):
 
         print("📥 Input:\n", input_df)
 
-        # Predict
+        
         prediction = model.predict(input_df)
         prediction_value = prediction.item()
 
         print("🧠 Raw prediction:", prediction_value)
 
-        # ⚠️ REGRESSOR FIX (your current case)
-        result = "Cancer Detected" if prediction_value >= 1.5 else "No Cancer"
+        
+        result = "Cancer Detected" if prediction_value >= 1.2 else "No Cancer"
 
         return {
             "prediction": float(prediction_value),
