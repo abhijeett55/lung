@@ -64,7 +64,7 @@ def predict(data: InputData):
             int(data.chest_pain)
             ]])
         
-         print("Array:", input_array)
+        print("Array:", input_array)
 
         prediction = model.predict(input_array)[0]
 
