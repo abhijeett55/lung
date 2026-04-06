@@ -7,9 +7,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "lung_model.pkl")
 model = joblib.load(MODEL_PATH)
+
 print("✅ Model loaded:", type(model))
 
 
@@ -48,7 +48,10 @@ def home():
 @app.post("/predict")
 def predict(data: InputData):
     try:
-        
+
+        # ---------------------------
+        # STEP 1: Create input
+        # ---------------------------
         input_df = pd.DataFrame([{
             "SMOKING": data.smoking,
             "YELLOW_FINGERS": data.yellow_fingers,
@@ -65,37 +68,22 @@ def predict(data: InputData):
             "CHEST PAIN": data.chest_pain
         }])
 
-        print("📥 Input:\n", input_df)
-
-        # prediction = model.predict(input_df)
-        # prediction_value = prediction.item()
+        print("📥 Raw input:\n", input_df)
 
         
 
-        # proba = model.predict_proba(input_df)[0][1]
-        # proba_value = prediction.item()
-        # print("🧠 Raw prediction:", proba_value)
-        
-        # result = "Cancer Detected" if proba_value >= 0.5 else "No Cancer"
+        # clean model feature names (REMOVE SPACES ISSUE)
+        model_features = [col.strip() for col in model.feature_names_in_]
 
-        
+        # also clean input columns
+        input_df.columns = input_df.columns.str.strip()
+
+        # align safely
+        input_df = input_df.reindex(columns=model_features, fill_value=0)
+
+        print("📊 Aligned input:\n", input_df)
+
        
-
-        # return {
-        #     "prediction": float(proba_value),
-        #     "result": result
-        # }
-
-        # Ensure column names match
-        #input_df.columns = input_df.columns.str.strip()
-        
-        clean_features = [col.strip() for col in model.feature_names_in_]
-        input_df = input_df.reindex(columns=clean_features, fill_value=0)
-
-        # Ensure correct order (VERY IMPORTANT)
-        # input_df = input_df[model.feature_names_in_]
-
-        # Get prediction + probability
         prediction = model.predict(input_df)[0]
         probability = model.predict_proba(input_df)[0][1]
 
