@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from fastapi import FastAPI
 from pydantic import BaseModel
+from sklearn.neighbors import KNeighborsClassifier
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -106,16 +107,13 @@ def predict(data: InputData):
 
         print("Array:", input_array)
 
-        # FIX HERE
-        prediction = model.predict(input_array)
-        prediction = float(prediction.squeeze())
+        prediction = int(model.predict(input_array)[0])
 
         probability = None
         if hasattr(model, "predict_proba"):
-            prob = model.predict_proba(input_array)
-            probability = float(prob.squeeze()[1])
+            probability = float(model.predict_proba(input_array)[0][1])
 
-        result = "Cancer Detected" if prediction >= 0.5 else "No Cancer"
+        result = "Cancer Detected" if prediction == 1 else "No Cancer"
 
         return {
             "prediction": prediction,
@@ -126,3 +124,10 @@ def predict(data: InputData):
     except Exception as e:
         print("❌ ERROR:", str(e))
         return {"error": str(e)}
+
+
+# return {
+        #     "prediction": prediction,
+        #     "probability": probability,
+        #     "result": result
+        # }
