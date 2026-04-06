@@ -40,24 +40,18 @@ class InputData(BaseModel):
     chest_pain: int
 
 
-@app.get("/")
-def home():
-    return {"message": "API running 🚀"}
-
-
 @app.post("/predict")
 def predict(data: InputData):
     try:
 
-        
         input_df = pd.DataFrame([{
             "SMOKING": data.smoking,
             "YELLOW_FINGERS": data.yellow_fingers,
             "ANXIETY": data.anxiety,
             "PEER_PRESSURE": data.peer_pressure,
             "CHRONIC DISEASE": data.chronic_disease,
-            "FATIGUE ": data.fatigue,
-            "ALLERGY ": data.allergy,
+            "FATIGUE": data.fatigue,
+            "ALLERGY": data.allergy,
             "WHEEZING": data.wheezing,
             "ALCOHOL CONSUMING": data.alcohol_consuming,
             "COUGHING": data.coughing,
@@ -66,33 +60,23 @@ def predict(data: InputData):
             "CHEST PAIN": data.chest_pain
         }])
 
-        print("📥 Raw input:\n", input_df)
-
-        
-
-        # clean model feature names (REMOVE SPACES ISSUE)
+        # clean columns
+        input_df.columns = input_df.columns.str.strip()
         model_features = [col.strip() for col in model.feature_names_in_]
 
-        # also clean input columns
-        input_df.columns = input_df.columns.str.strip()
-
-        # align safely
         input_df = input_df.reindex(columns=model_features, fill_value=0)
 
-        print("📊 Aligned input:\n", input_df)
-
-       
         prediction = model.predict(input_df)[0]
-        probability = model.predict_proba(input_df)[0][1]
 
-        print("🧠 Prediction:", prediction)
-        print("📊 Probability:", probability)
+        probability = None
+        if hasattr(model, "predict_proba"):
+            probability = model.predict_proba(input_df)[0][1]
 
-        result = "Cancer Detected" if probability >= 0.5 else "No Cancer"
+        result = "Cancer Detected" if prediction == 1 else "No Cancer"
 
         return {
             "prediction": int(prediction),
-            "probability": float(probability),
+            "probability": float(probability) if probability else None,
             "result": result
         }
 
