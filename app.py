@@ -77,7 +77,7 @@ def predict(data: InputData):
         prediction_value = prediction.item()  # 🔥 THIS FIXES YOUR ERROR
 
         # Since it's REGRESSOR → convert to class
-        result = "Cancer Detected" if prediction_value >= 0.5 else "No Cancer"
+        result = "Cancer Detected" if prediction_value >= 1.5 else "No Cancer"
 
         return {
             "prediction": float(prediction_value),
