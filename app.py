@@ -69,7 +69,7 @@ def predict(data: InputData):
 
 
         
-        if prediction >= 2.0:
+        if prediction >= 1.5:
             result = "Cancer Detected"
         else:
             result = "No Cancer"
