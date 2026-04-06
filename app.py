@@ -55,8 +55,8 @@ def predict(data: InputData):
             "ANXIETY": data.anxiety,
             "PEER_PRESSURE": data.peer_pressure,
             "CHRONIC DISEASE": data.chronic_disease,
-            "FATIGUE ": data.fatigue,
-            "ALLERGY ": data.allergy,
+            "FATIGUE": data.fatigue,
+            "ALLERGY": data.allergy,
             "WHEEZING": data.wheezing,
             "ALCOHOL CONSUMING": data.alcohol_consuming,
             "COUGHING": data.coughing,
@@ -67,17 +67,43 @@ def predict(data: InputData):
 
         print("📥 Input:\n", input_df)
 
-        
-        prediction = model.predict(input_df)
-        prediction_value = prediction.item()
-
-        print("🧠 Raw prediction:", prediction_value)
+        # prediction = model.predict(input_df)
+        # prediction_value = prediction.item()
 
         
-        result = "Cancer Detected" if prediction_value >= 1.0 else "No Cancer"
+
+        # proba = model.predict_proba(input_df)[0][1]
+        # proba_value = prediction.item()
+        # print("🧠 Raw prediction:", proba_value)
+        
+        # result = "Cancer Detected" if proba_value >= 0.5 else "No Cancer"
+
+        
+       
+
+        # return {
+        #     "prediction": float(proba_value),
+        #     "result": result
+        # }
+
+        # Ensure column names match
+        input_df.columns = input_df.columns.str.strip()
+
+        # Ensure correct order (VERY IMPORTANT)
+        input_df = input_df[model.feature_names_in_]
+
+        # Get prediction + probability
+        prediction = model.predict(input_df)[0]
+        probability = model.predict_proba(input_df)[0][1]
+
+        print("🧠 Prediction:", prediction)
+        print("📊 Probability:", probability)
+
+        result = "Cancer Detected" if probability >= 0.5 else "No Cancer"
 
         return {
-            "prediction": float(prediction_value),
+            "prediction": int(prediction),
+            "probability": float(probability),
             "result": result
         }
 
