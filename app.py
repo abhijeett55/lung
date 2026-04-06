@@ -1,21 +1,19 @@
 import os
 import joblib
-import numpy as np
 import pandas as pd
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
-# Initialize FastAPI app
 app = FastAPI()
 
-# Load model once at startup
+# Load model
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "lung_model.pkl")
 model = joblib.load(MODEL_PATH)
 print("✅ Model loaded:", type(model))
 
 
-# Enable CORS (for frontend connection)
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -42,25 +40,23 @@ class InputData(BaseModel):
     chest_pain: int
 
 
-# Health check route
 @app.get("/")
 def home():
-    return {"message": "Lung Cancer Prediction API is running 🚀"}
+    return {"message": "API running 🚀"}
 
 
-# Prediction route
 @app.post("/predict")
 def predict(data: InputData):
     try:
-        # Convert to DataFrame (VERY IMPORTANT FIX)
+        # ✅ Always use DataFrame (matches training)
         input_df = pd.DataFrame([{
             "SMOKING": data.smoking,
             "YELLOW_FINGERS": data.yellow_fingers,
             "ANXIETY": data.anxiety,
             "PEER_PRESSURE": data.peer_pressure,
             "CHRONIC DISEASE": data.chronic_disease,
-            "FATIGUE ": data.fatigue,   # ⚠️ keep space EXACTLY
-            "ALLERGY ": data.allergy,   # ⚠️ keep space EXACTLY
+            "FATIGUE ": data.fatigue,
+            "ALLERGY ": data.allergy,
             "WHEEZING": data.wheezing,
             "ALCOHOL CONSUMING": data.alcohol_consuming,
             "COUGHING": data.coughing,
@@ -69,14 +65,15 @@ def predict(data: InputData):
             "CHEST PAIN": data.chest_pain
         }])
 
-        print("📥 DataFrame Input:\n", input_df)
+        print("📥 Input:\n", input_df)
 
+        # Predict
         prediction = model.predict(input_df)
+        prediction_value = prediction.item()
 
-        # FIX: safely extract value
-        prediction_value = prediction.item()  # 🔥 THIS FIXES YOUR ERROR
+        print("🧠 Raw prediction:", prediction_value)
 
-        # Since it's REGRESSOR → convert to class
+        # ⚠️ REGRESSOR FIX (your current case)
         result = "Cancer Detected" if prediction_value >= 1.5 else "No Cancer"
 
         return {
@@ -87,45 +84,3 @@ def predict(data: InputData):
     except Exception as e:
         print("❌ ERROR:", str(e))
         return {"error": str(e)}
-    try:
-        # Convert input to array (order MUST match training)
-        input_array = np.array([[ 
-            data.smoking,
-            data.yellow_fingers,
-            data.anxiety,
-            data.peer_pressure,
-            data.chronic_disease,
-            data.fatigue,
-            data.allergy,
-            data.wheezing,
-            data.alcohol_consuming,
-            data.coughing,
-            data.shortness_of_breath,
-            data.swallowing_difficulty,
-            data.chest_pain
-        ]])
-
-        print("📥 Received Input:", input_array)
-
-        # Predict
-        prediction = model.predict(input_array)[0]
-
-        # Probability (only if classifier supports it)
-        probability = None
-        if hasattr(model, "predict_proba"):
-            probability = model.predict_proba(input_array)[0][1]
-
-        # Result label
-        result = "Cancer Detected" if prediction == 1 else "No Cancer"
-
-        return {
-            "prediction": int(prediction),
-            "probability": float(probability) if probability is not None else None,
-            "result": result
-        }
-
-    except Exception as e:
-        print("❌ ERROR:", str(e))
-        return {
-            "error": str(e)
-        }
