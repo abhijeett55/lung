@@ -5,7 +5,14 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
-model = joblib.load(os.path.join(os.path.dirname(__file__), "lung_model.pkl"))
+model = None
+
+def get_model():
+    global model
+    if model is None:
+        model = joblib.load(os.path.join(os.path.dirname(__file__), "lung_model.pkl"))
+    return model
+
 print(type(model))
 
 app = FastAPI()
@@ -56,8 +63,10 @@ def predict(data: InputData):
 
         print("Array:", input_array)
 
+        model = get_model()
         prediction = model.predict(input_array)
-        prediction = float(prediction.flatten()[0])
+        prediction = float(np.array(prediction).ravel()[0])
+
 
         
         if prediction >= 1.5:
