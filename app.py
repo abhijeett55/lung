@@ -93,7 +93,7 @@ def predict(data: InputData):
         input_df = input_df.reindex(columns=clean_features, fill_value=0)
 
         # Ensure correct order (VERY IMPORTANT)
-        input_df = input_df[model.feature_names_in_]
+        # input_df = input_df[model.feature_names_in_]
 
         # Get prediction + probability
         prediction = model.predict(input_df)[0]
