@@ -1,6 +1,7 @@
 import os
 import joblib
 import numpy as np
+import pandas as pd
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -50,6 +51,42 @@ def home():
 # Prediction route
 @app.post("/predict")
 def predict(data: InputData):
+    try:
+        # Convert to DataFrame (VERY IMPORTANT FIX)
+        input_df = pd.DataFrame([{
+            "SMOKING": data.smoking,
+            "YELLOW_FINGERS": data.yellow_fingers,
+            "ANXIETY": data.anxiety,
+            "PEER_PRESSURE": data.peer_pressure,
+            "CHRONIC DISEASE": data.chronic_disease,
+            "FATIGUE ": data.fatigue,   # ⚠️ keep space EXACTLY
+            "ALLERGY ": data.allergy,   # ⚠️ keep space EXACTLY
+            "WHEEZING": data.wheezing,
+            "ALCOHOL CONSUMING": data.alcohol_consuming,
+            "COUGHING": data.coughing,
+            "SHORTNESS OF BREATH": data.shortness_of_breath,
+            "SWALLOWING DIFFICULTY": data.swallowing_difficulty,
+            "CHEST PAIN": data.chest_pain
+        }])
+
+        print("📥 DataFrame Input:\n", input_df)
+
+        prediction = model.predict(input_df)
+
+        # FIX: safely extract value
+        prediction_value = prediction.item()  # 🔥 THIS FIXES YOUR ERROR
+
+        # Since it's REGRESSOR → convert to class
+        result = "Cancer Detected" if prediction_value >= 0.5 else "No Cancer"
+
+        return {
+            "prediction": float(prediction_value),
+            "result": result
+        }
+
+    except Exception as e:
+        print("❌ ERROR:", str(e))
+        return {"error": str(e)}
     try:
         # Convert input to array (order MUST match training)
         input_array = np.array([[ 
