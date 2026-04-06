@@ -74,7 +74,7 @@ def predict(data: InputData):
         print("🧠 Raw prediction:", prediction_value)
 
         
-        result = "Cancer Detected" if prediction_value >= 1.2 else "No Cancer"
+        result = "Cancer Detected" if prediction_value >= 1.0 else "No Cancer"
 
         return {
             "prediction": float(prediction_value),
