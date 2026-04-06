@@ -66,7 +66,7 @@ def predict(data: InputData):
             result = "No Cancer"
 
         return {
-            "prediction": float(prediction),
+            "prediction": prediction,
             "result": result
         }
 
