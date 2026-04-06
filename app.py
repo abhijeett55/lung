@@ -49,17 +49,15 @@ def home():
 def predict(data: InputData):
     try:
 
-        # ---------------------------
-        # STEP 1: Create input
-        # ---------------------------
+        
         input_df = pd.DataFrame([{
             "SMOKING": data.smoking,
             "YELLOW_FINGERS": data.yellow_fingers,
             "ANXIETY": data.anxiety,
             "PEER_PRESSURE": data.peer_pressure,
             "CHRONIC DISEASE": data.chronic_disease,
-            "FATIGUE": data.fatigue,
-            "ALLERGY": data.allergy,
+            "FATIGUE ": data.fatigue,
+            "ALLERGY ": data.allergy,
             "WHEEZING": data.wheezing,
             "ALCOHOL CONSUMING": data.alcohol_consuming,
             "COUGHING": data.coughing,
