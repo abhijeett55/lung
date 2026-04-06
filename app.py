@@ -107,12 +107,13 @@ def predict(data: InputData):
 
         print("Array:", input_array)
 
-        # ✅ FIXED
-        prediction = int(model.predict(input_array)[0])
+        pred = model.predict(input_array)
+        prediction = int(np.ravel(pred)[0])
 
         probability = None
         if hasattr(model, "predict_proba"):
-            probability = float(model.predict_proba(input_array)[0][1])
+            prob = model.predict_proba(input_array)
+            probability = float(np.ravel(prob)[1])
 
         result = "Cancer Detected" if prediction == 1 else "No Cancer"
 
@@ -125,7 +126,6 @@ def predict(data: InputData):
     except Exception as e:
         print("❌ ERROR:", str(e))
         return {"error": str(e)}
-
 
 # return {
         #     "prediction": prediction,
