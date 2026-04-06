@@ -63,12 +63,8 @@ def predict(data: InputData):
             int(data.swallowing_difficulty),
             int(data.chest_pain)
             ]])
-
-        # clean columns
-        input_array.columns = input_array.columns.str.strip()
-        model_features = [col.strip() for col in model.feature_names_in_]
-
-        input_array = input_array.reindex(columns=model_features, fill_value=0)
+        
+         print("Array:", input_array)
 
         prediction = model.predict(input_array)[0]
 
