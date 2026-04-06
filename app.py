@@ -12,7 +12,8 @@ def get_model():
     if model is None:
         model = joblib.load(os.path.join(os.path.dirname(__file__), "lung_model.pkl"))
     return model
-
+    
+model = get_model()
 print(type(model))
 
 app = FastAPI()
@@ -63,13 +64,13 @@ def predict(data: InputData):
 
         print("Array:", input_array)
 
-        model = get_model()
+        
         prediction = model.predict(input_array)
         prediction = float(np.array(prediction).ravel()[0])
 
 
         
-        if prediction >= 1.5:
+        if prediction == 1:
             result = "Cancer Detected"
         else:
             result = "No Cancer"
