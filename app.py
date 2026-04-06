@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-# Load model
+
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "lung_model.pkl")
 model = joblib.load(MODEL_PATH)
 print("✅ Model loaded:", type(model))
@@ -48,7 +48,7 @@ def home():
 @app.post("/predict")
 def predict(data: InputData):
     try:
-        # ✅ Always use DataFrame (matches training)
+        
         input_df = pd.DataFrame([{
             "SMOKING": data.smoking,
             "YELLOW_FINGERS": data.yellow_fingers,
